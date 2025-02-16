@@ -1,0 +1,17 @@
+# in-silico-pcr
+
+For a set of primers, we want to see if they match any regions in a large multi-fasta file for metagenomic analysis.
+
+To do this we are:
+
+1. Creating a Dockerfile that generates an image for isPCR from UCSC to run on the cluster.
+2. Authoring a slurm script that can run this tool in an arrayed manner in an HPC environment.
+3. Collecting other command line methods into commands.txt to regenerate the pipeline.
+
+For the pipeline itself:
+
+1. Create a tsv file of our primer pairs (primers.txt)
+2. Create an index of our fasta file for fast access
+3. We want to run our slurm script to match our primer pairs against our fasta.
+4. We want to filter amplicons from 250-600 basepair matches.
+

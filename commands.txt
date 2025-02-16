@@ -1,0 +1,5 @@
+cut -f3- primers_raw.tsv | grep -vP '^[[:space:]]*$' > primers.tsv
+# use ggrep on osx (download via homebrew)
+
+docker build --platform linux/amd64 -t is-pcr-image:latest .
+
