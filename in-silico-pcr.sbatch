@@ -6,7 +6,7 @@
 #SBATCH --array=1-20               # 20 input files (one per array task)
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=2G                   # Adjust memory as needed
+#SBATCH --mem=64G                   # Adjust memory as needed
 
 # Load the Singularity module if required on your HPC
 module load singularity
@@ -14,14 +14,11 @@ module load singularity
 # Define directories
 # INPUT_DIR contains Primer3 input files (e.g., primer3_input_1.txt, primer3_input_2.txt, ...)
 # OUTPUT_DIR is where the Primer3 output files will be written.
-INPUT_DIR="/path/to/primer3_inputs"
-OUTPUT_DIR="/path/to/primer3_results"
+INPUT_DIR="/vast/kr3059/in-silico-pcr/inputs"
+OUTPUT_DIR="/vast/kr3059/in-silico-pcr/outputs"
 
 # Singularity image containing primer3_core
-SINGULARITY_IMAGE="/path/to/my_primer3_image.sif"
-
-# Create output directory if it doesn't exist
-mkdir -p "${OUTPUT_DIR}"
+SINGULARITY_IMAGE="/vast/kr3059/primer3-image_latest.sif"
 
 # Define input and output files based on the SLURM array index
 INPUT_FILE="${INPUT_DIR}/primer3_input_${SLURM_ARRAY_TASK_ID}.txt"
