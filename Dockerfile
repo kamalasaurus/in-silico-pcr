@@ -1,31 +1,24 @@
-# Use Ubuntu 20.04 as the base image
-FROM ubuntu:20.04
+# Use the standard Python 3.9 image (non-slim)
+FROM python:3.9
 
-# Disable interactive prompts during package installs
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install necessary packages for building PrimerJinn
+# Install necessary dependencies, including BLAST+ and any additional tools
 RUN apt-get update && apt-get install -y \
-    git \
     build-essential \
-    cmake \
+    python3-dev \
+    wget \
+    ncbi-blast+ \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone the PrimerJinn repository (adjust URL if needed)
-RUN git clone https://github.com/SemiQuant/primerJinn.git /opt/primerJinn
+# Upgrade pip and install primerJinn from the remote PyPI source
+RUN pip install --upgrade pip && \
+    pip install primerJinn
 
-# Build PrimerJinn
-WORKDIR /opt/primerJinn
-RUN mkdir -p build && cd build && cmake .. && make
-
-# Optionally, create directories for input and output if your workflow requires it.
+# Optionally, create directories for input and output data
 RUN mkdir -p /data/inputs /data/outputs
 
-# Add the build directory to PATH so the binary is easily accessible
-ENV PATH="/opt/primerJinn/build:${PATH}"
+# Set the entrypoint.
+# This assumes that installing the package creates an executable "primerJinn" in PATH.
+ENTRYPOINT ["primerJinn"]
 
-# Set the entrypoint to the PrimerJinn binary (adjust the binary name if different)
-ENTRYPOINT ["/opt/primerJinn/build/primerJinn"]
-
-# If no command-line arguments are provided, display the help message.
+# If no arguments are provided, display the help message.
 CMD ["--help"]

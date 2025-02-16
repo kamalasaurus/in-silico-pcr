@@ -8,7 +8,7 @@ cut -f3- primers_raw.tsv | grep -vP '^[[:space:]]*$' > primers.tsv
 -docker tag primer3-image:latest kamalasaurus/primer3-image:latest
 -docker push kamalasaurus/primer3-image:latest
 
-docker build --platform linux/amd64 -t yourusername/primerjinn:latest .
+docker build --platform linux/amd64 -t primerjinn:latest .
 
 docker tag primerjinn:latest kamalasaurus/primerjinn:latest
 docker push kamalasaurus/primerjinn:latest
