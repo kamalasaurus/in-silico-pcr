@@ -26,9 +26,6 @@ OUTPUT_DIR="/scratch/kms9971/in-silico-pcr/outputs"           # output directory
 #forward=$(echo "$line" | cut -f1)
 #reverse=$(echo "$line" | cut -f2)
 
-forward="GGATGGATACGCCCGGTAAC"
-reverse="GACGTTGACCATCATCGGGT"
-
 echo "Task ${SLURM_ARRAY_TASK_ID}: Forward primer: $forward, Reverse primer: $reverse"
 
 # Run PrimerJinn in silico PCR using the extracted primer pair.
