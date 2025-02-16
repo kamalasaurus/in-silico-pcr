@@ -1,27 +1,22 @@
-# Use an Ubuntu base image
+# Use Ubuntu 20.04 as a base image
 FROM ubuntu:20.04
 
-# Disable interactive frontend during build
+# Disable interactive prompts during package installs
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install necessary tools
+# Update package lists and install Primer3 (primer3_core) and any needed utilities
 RUN apt-get update && \
-    apt-get install -y wget ca-certificates && \
+    apt-get install -y primer3 && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /opt
+# Set the working directory
+WORKDIR /data
 
-# Download the isPCR binary from UCSC (for linux.x86_64)
-RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/isPcr && \
-    chmod +x isPcr && \
-    mv isPcr /usr/local/bin/
+# Verify installation (optional; you can remove this line later)
+RUN command -v primer3_core
 
-# Optionally, verify installation by displaying the usage message
-RUN /usr/local/bin/isPcr -help
+# Set the entrypoint so that the container acts as a primer3_core executable.
+ENTRYPOINT ["primer3_core"]
 
-# Set the entrypoint to isPCR so that it runs when the container is executed.
-ENTRYPOINT ["/usr/local/bin/isPcr"]
-
-# By default, display help if no arguments are passed.
-CMD ["-help"]
+# By default, if no arguments are provided, show the help message.
+CMD ["--help"]
