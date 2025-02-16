@@ -1,5 +1,5 @@
 # Use the standard Python 3.9 image (non-slim)
-FROM python:3.9
+FROM python:3.9-slim
 
 # Install necessary dependencies, including BLAST+ and any additional tools
 RUN apt-get update && apt-get install -y \
