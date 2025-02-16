@@ -3,3 +3,5 @@ cut -f3- primers_raw.tsv | grep -vP '^[[:space:]]*$' > primers.tsv
 
 docker build --platform linux/amd64 -t primer3-image:latest .
 
+singularity pull docker://kamalasaurus/primer3-image:latest
+

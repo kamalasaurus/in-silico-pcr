@@ -9,14 +9,17 @@ RUN apt-get update && \
     apt-get install -y primer3 && \
     rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Create directories for input and output data
+RUN mkdir -p /data/inputs /data/outputs
+
+# Set the working directory to /data
 WORKDIR /data
 
-# Verify installation (optional; you can remove this line later)
+# Optionally verify that primer3_core is available
 RUN command -v primer3_core
 
 # Set the entrypoint so that the container acts as a primer3_core executable.
 ENTRYPOINT ["primer3_core"]
 
-# By default, if no arguments are provided, show the help message.
-CMD ["--help"]
+# If no arguments are provided, simply run primer3_core without arguments.
+CMD []
