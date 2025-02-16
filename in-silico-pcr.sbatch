@@ -7,16 +7,18 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
+#SBATCH --account=pr_162_general
 
 # Load Singularity module if required by your system
-module load singularity
+module load singularity/3.7.4
 
 # Define paths
-PRIMER_FILE="/vast/kr3059/in-silico-pcr/inputs/primers.tsv"      # primers.tsv: each line has forward<tab>reverse
-FASTA="/vast/kr3059/in-silico-pcr/inputs/target.fasta"           # your large FASTA file
-SINGULARITY_IMAGE="/vast/kr3059/primerjinn.sif"  # your PrimerJinn Singularity image
-OUTPUT_DIR="/vast/kr3059/outputs"           # output directory for result files
+PRIMER_FILE="/scratch/kms9971/in-silico-pcr/inputs/primers.txt"      # primers.tsv: each line has forward<tab>reverse
+FASTA="/scratch/kms9971/positive_control_PCR/NODE_9998_length_1843_cov_1.782998"           # your large FASTA file
+SINGULARITY_IMAGE="/scratch/kms9971/primerjinn_latest.sif"  # your PrimerJinn Singularity image
+OUTPUT_DIR="/scratch/kms9971/in-silico-pcr/outputs"           # output directory for result files
 
+#positive_control_PCR/NODE_9998_length_1843_cov_1.782998
 
 # Extract the current line from the primer file corresponding to the array index
 #line=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "${PRIMER_FILE}")
@@ -32,10 +34,10 @@ echo "Task ${SLURM_ARRAY_TASK_ID}: Forward primer: $forward, Reverse primer: $re
 # Run PrimerJinn in silico PCR using the extracted primer pair.
 # (Adjust the command-line options to match PrimerJinn's usage.)
 singularity exec \
-    -B "${OUTPUT_DIR}":/data/results \
-    -B "${FASTA}":/data/assembly.fasta \
+    -B /scratch/kms9971/in-silico-pcr/inputs:/data/inputs/:rw \
+    -B "${OUTPUT_DIR}":/data/outputs:rw \
+    -B "${FASTA}":/data/assembly.fasta:rw \
     ${SINGULARITY_IMAGE} \
-    primerJinn --forward "$forward" --reverse "$reverse" --fasta /data/assembly.fasta \
-    > "${OUTPUT_DIR}/output_${SLURM_ARRAY_TASK_ID}.txt"
+    PCRinSilico --primer_seq /data/inputs/primers.txt --input_file /data/assembly.fasta --output /data/outputs/output
 
 echo "Task ${SLURM_ARRAY_TASK_ID} complete. Results in ${OUTPUT_DIR}/output_${SLURM_ARRAY_TASK_ID}.txt"

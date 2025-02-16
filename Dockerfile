@@ -1,7 +1,7 @@
-# Use the standard Python 3.9 image (non-slim)
-FROM python:3.9-slim
+# Use a non-slim Python image as an example
+FROM python:3.9
 
-# Install necessary dependencies, including BLAST+ and any additional tools
+# Install necessary dependencies (e.g., BLAST+ if needed)
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
@@ -9,16 +9,15 @@ RUN apt-get update && apt-get install -y \
     ncbi-blast+ \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and install primerJinn from the remote PyPI source
+# Upgrade pip and install primerJinn and xlsxwriter from PyPI
 RUN pip install --upgrade pip && \
-    pip install primerJinn
+    pip install primerJinn xlsxwriter
 
 # Optionally, create directories for input and output data
 RUN mkdir -p /data/inputs /data/outputs
 
 # Set the entrypoint.
-# This assumes that installing the package creates an executable "primerJinn" in PATH.
-ENTRYPOINT ["primerJinn"]
+ENTRYPOINT ["PCRinSilico"]
 
-# If no arguments are provided, display the help message.
+# Default command displays help if no arguments provided.
 CMD ["--help"]
