@@ -1,36 +1,41 @@
 #!/bin/bash
-#SBATCH --job-name=primer3_job
+#SBATCH --job-name=primerjinn_in_silico
 #SBATCH --output=slurm_%A_%a.out
 #SBATCH --error=slurm_%A_%a.err
-#SBATCH --time=01:00:00            # Adjust based on expected runtime
-#SBATCH --array=1-20               # 20 input files (one per array task)
+#SBATCH --time=02:00:00            # adjust runtime as needed
+##SBATCH --array=1-10               # adjust to the number of primer pairs you want to run
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=64G                   # Adjust memory as needed
+#SBATCH --mem=64G
 
-# Load the Singularity module if required on your HPC
+# Load Singularity module if required by your system
 module load singularity
 
-# Define directories
-# INPUT_DIR contains Primer3 input files (e.g., primer3_input_1.txt, primer3_input_2.txt, ...)
-# OUTPUT_DIR is where the Primer3 output files will be written.
-INPUT_DIR="/vast/kr3059/in-silico-pcr/inputs"
-OUTPUT_DIR="/vast/kr3059/in-silico-pcr/outputs"
+# Define paths
+PRIMER_FILE="/vast/kr3059/in-silico-pcr/inputs/primers.tsv"      # primers.tsv: each line has forward<tab>reverse
+FASTA="/vast/kr3059/in-silico-pcr/inputs/target.fasta"           # your large FASTA file
+SINGULARITY_IMAGE="/vast/kr3059/primerjinn.sif"  # your PrimerJinn Singularity image
+OUTPUT_DIR="/vast/kr3059/outputs"           # output directory for result files
 
-# Singularity image containing primer3_core
-SINGULARITY_IMAGE="/vast/kr3059/primer3-image_latest.sif"
 
-# Define input and output files based on the SLURM array index
-INPUT_FILE="${INPUT_DIR}/primer3_input_${SLURM_ARRAY_TASK_ID}.txt"
-OUTPUT_FILE="${OUTPUT_DIR}/primer3_output_${SLURM_ARRAY_TASK_ID}.txt"
+# Extract the current line from the primer file corresponding to the array index
+#line=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "${PRIMER_FILE}")
+# If your file is tab-separated with forward and reverse primers:
+#forward=$(echo "$line" | cut -f1)
+#reverse=$(echo "$line" | cut -f2)
 
-echo "Processing input file: ${INPUT_FILE}"
+forward="GGATGGATACGCCCGGTAAC"
+reverse="GACGTTGACCATCATCGGGT"
 
-# Execute primer3_core inside the Singularity container.
-# Bind the input and output directories so they are accessible inside the container.
-singularity exec -B "${INPUT_DIR}":/data/inputs \
-                 -B "${OUTPUT_DIR}":/data/outputs \
-                 "${SINGULARITY_IMAGE}" \
-                 primer3_core < /data/inputs/$(basename ${INPUT_FILE}) > /data/outputs/$(basename ${OUTPUT_FILE})
+echo "Task ${SLURM_ARRAY_TASK_ID}: Forward primer: $forward, Reverse primer: $reverse"
 
-echo "Task ${SLURM_ARRAY_TASK_ID} complete. Output written to ${OUTPUT_FILE}"
+# Run PrimerJinn in silico PCR using the extracted primer pair.
+# (Adjust the command-line options to match PrimerJinn's usage.)
+singularity exec \
+    -B "${OUTPUT_DIR}":/data/results \
+    -B "${FASTA}":/data/assembly.fasta \
+    ${SINGULARITY_IMAGE} \
+    primerJinn --forward "$forward" --reverse "$reverse" --fasta /data/assembly.fasta \
+    > "${OUTPUT_DIR}/output_${SLURM_ARRAY_TASK_ID}.txt"
+
+echo "Task ${SLURM_ARRAY_TASK_ID} complete. Results in ${OUTPUT_DIR}/output_${SLURM_ARRAY_TASK_ID}.txt"
