@@ -5,3 +5,7 @@ docker build --platform linux/amd64 -t primer3-image:latest .
 
 singularity pull docker://kamalasaurus/primer3-image:latest
 
+docker tag primer3-image:latest kamalasaurus/primer3-image:latest
+docker push kamalasaurus/primer3-image:latest
+
+
