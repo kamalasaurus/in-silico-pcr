@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 #SBATCH --job-name=primerjinn_in_silico
 #SBATCH --output=slurm_%A_%a.out
 #SBATCH --error=slurm_%A_%a.err
@@ -37,6 +37,6 @@ singularity exec \
     -B "${OUTPUT_DIR}":/data/outputs:rw \
     -B "${FASTA}":/data/assembly.fasta:rw \
     ${SINGULARITY_IMAGE} \
-    PCRinSilico --primer_seq /data/inputs/primers.txt --input_file /data/assembly.fasta --output "/data/outputs/output_${SLURM_ARRAY_TASK_ID}"
+    PCRinSilico --primer_seq /data/inputs/primers.txt --input_file /data/assembly.fasta --output "/data/outputs/output_${SLURM_ARRAY_TASK_ID}" --product_size_max 4000 --req_five FALSE
 
 echo "Task ${SLURM_ARRAY_TASK_ID} complete. Results in ${OUTPUT_DIR}/output_${SLURM_ARRAY_TASK_ID}.txt"
