@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 #SBATCH --job-name=primerjinn_in_silico
 #SBATCH --output=slurm_%A_%a.out
 #SBATCH --error=slurm_%A_%a.err
@@ -26,7 +26,9 @@ OUTPUT_DIR="/scratch/kms9971/in-silico-pcr/outputs"           # output directory
 #forward=$(echo "$line" | cut -f1)
 #reverse=$(echo "$line" | cut -f2)
 
-echo "Task ${SLURM_ARRAY_TASK_ID}: Forward primer: $forward, Reverse primer: $reverse"
+cat "${PRIMER_FILE}"
+
+#echo "Task ${SLURM_ARRAY_TASK_ID}: Forward primer: $forward, Reverse primer: $reverse"
 
 # Run PrimerJinn in silico PCR using the extracted primer pair.
 # (Adjust the command-line options to match PrimerJinn's usage.)
@@ -35,6 +37,6 @@ singularity exec \
     -B "${OUTPUT_DIR}":/data/outputs:rw \
     -B "${FASTA}":/data/assembly.fasta:rw \
     ${SINGULARITY_IMAGE} \
-    PCRinSilico --primer_seq /data/inputs/primers.txt --input_file /data/assembly.fasta --output /data/outputs/output
+    PCRinSilico --primer_seq /data/inputs/primers.txt --input_file /data/assembly.fasta --output "/data/outputs/output_${SLURM_ARRAY_TASK_ID}"
 
 echo "Task ${SLURM_ARRAY_TASK_ID} complete. Results in ${OUTPUT_DIR}/output_${SLURM_ARRAY_TASK_ID}.txt"
