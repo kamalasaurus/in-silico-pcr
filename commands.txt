@@ -17,4 +17,4 @@ chmod a+w outputs
 
 sbatch in-silico-pcr.sbatch
 
-
+awk 'NR>1 {print ">"$3"\n"$1"\n>"$4"\n"$2}' FS='\t' primers.tsv > primers.fasta
